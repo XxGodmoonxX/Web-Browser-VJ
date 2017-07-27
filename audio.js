@@ -1,49 +1,48 @@
-// AudioContextクラスのインスタンスを生成、これが処理の起点
-//これをすることにより、Web Audio APOが定義するプロパティやメソッドにアクセス可能。
-// ベンダープレフィックス等がブラウザの実装には必要
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
-// Create the instance of AudioContext
-var context = new AudioContext();
+(function() {
+  //AudioContextクラスのコンストラクタを呼び出して、
+  //AudioContextクラスのインスタンスを生成。これが処理の起点
+  //これをすることにより、Web Audio APIが定義するプロパティやメソッドにアクセス可能。
+  // ベンダープレフィックスが現状のブラウザの実装には必要
+  //Firefoxではプレフィックスなし、Operaではプレフィックスに対応
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  var context = new AudioContext();
 
-  // // OscillatorNodeクラスのcreateOscillatorメソッドでOscillatorNodeインスタンスを生成
-  // // ↓
-  // // connectメソッドで、OscillatorNodeインスタンスを出力点であるAudioDestinationNodeインスタンスに接続
-  // // Create the instance of OscillatorNode
-  // var oscillator = context.createOscillator();
-  // // OscillatorNode (Input) -> AudioDestinationNode (Output)
-  // oscillator.connect(context.destination);
-  //
-  // // まだ音を出せない、音源スイッチをONにしていないから。
-  // // for legacy browsers、古いブラウザ用
-  // oscillator.start = oscillator.start || oscillator.noteOn;
-  // oscillator.stop  = oscillator.stop  || oscillator.noteOff;
-  // // Start sound
-  // oscillator.start(0); //即サウンド開始
-  // // Stop sound (after 5 sec)
-  // window.setTimeout(function() {
-  //     oscillator.stop(0);
-  // }, 5000);
+  // 音源ノード生成（audio要素からオーディオデータ取得）
+  var audioSrc = document.getElementById("audio-element"); // audio要素を取得
+  var audio = context.createMediaElementSource(audioSrc); // audio要素を音源とするMediaElementAudioSourceNodeを生成
 
-  // ボリュームコントローラ
-  // GainNodeインスタンスの生成は、AudioContextインスタンスのcreateGainメソッドの呼び出しで可能
-  // for legacy browsers
-  context.createGain = context.createGain || context.createGainNode;
-  // Create the instance of GainNode
+  // 中間処理（音量調整処理）を表すAudioNodeが持つAudioParamに
+  // input要素の値を代入。表示にも値を反映する
+  var elementGain = document.getElementById('gain');
+  var elementGainValue = document.getElementById('gain-value')
   var gain = context.createGain();
+  setGain = function() {
+    gain.gain.value = elementGainValue.innnerText = elementGain.value;
+  };
+  setGain();
 
-  //OscillatorNodeインスタンス生成、connectメソッドで繋ぐ
-  // Create the instance of OscillatorNode
-  var oscillator = context.createOscillator();
-  // for legacy browsers
-  oscillator.start = oscillator.start || oscillator.noteOn;
-  oscillator.stop  = oscillator.stop  || oscillator.noteOff;
-  oscillator.start(0); //即サウンド再生
-  window.setTimeout(function() {
-    oscillator.stop(0);
-  }, 5000); //5秒後oscillator.stop(0)実行、即停止
-  // OscillatorNode (Input) -> GainNode (Volume Controller) -> AudioDestinationNode (Output)
-  oscillator.connect(gain); //OscillatorNode→GainNode
-  gain.connect(context.destination); //GainNode→AudioDestinationNode
+  //音源ノード → GainNode
+  audio.connect(gain);
 
-  //GainNodeインスタンスのgainプロパティのvalueプロパティ
-  gain.gain.value = 0.5; //ボリュームを0.5に設定
+  // オーディオノード接続：Gainノード -> 音声出力ノード
+  gain.connect(context.destination);
+
+  // 音源再生
+  // audioSrc.play();
+  //10病後停止
+  // window.setTimeout(function() {
+  //   audio.pause();
+  // }, 10000);
+
+  //再生＆停止ボタン
+  var elementButton = document.getElementById('button');
+  var isPlaying;
+  // DOMへのイベント登録
+  elementButton.addEventListener('click', function() {
+    //最初は再生されていない、押すと再生
+    audioSrc[!isPlaying ? 'play' : 'pause']();
+    isPlaying = !isPlaying;
+  });
+  elementGain.addEventListener('mouseup', setGain);
+
+})();
