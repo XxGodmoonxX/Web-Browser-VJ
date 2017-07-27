@@ -16,8 +16,8 @@
   var elementGain = document.getElementById('gain');
   var elementGainValue = document.getElementById('gain-value')
   var gain = context.createGain();
-  setGain = function() {
-    gain.gain.value = elementGainValue.innnerText = elementGain.value;
+  var setGain = function() {
+    gain.gain.value = elementGainValue.innerText = elementGain.value;
   };
   setGain();
 
@@ -26,13 +26,6 @@
 
   // オーディオノード接続：Gainノード -> 音声出力ノード
   gain.connect(context.destination);
-
-  // 音源再生
-  // audioSrc.play();
-  //10病後停止
-  // window.setTimeout(function() {
-  //   audio.pause();
-  // }, 10000);
 
   //再生＆停止ボタン
   var elementButton = document.getElementById('button');
