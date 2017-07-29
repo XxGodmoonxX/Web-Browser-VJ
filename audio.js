@@ -1,4 +1,8 @@
 (function() {
+
+  //厳格モード
+  'use strict';
+
   //AudioContextクラスのコンストラクタを呼び出して、
   //AudioContextクラスのインスタンスを生成。これが処理の起点
   //これをすることにより、Web Audio APIが定義するプロパティやメソッドにアクセス可能。
