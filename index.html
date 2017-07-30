@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <title>Web Browser VJ</title>
-  <meta name="viewport" content="width=device-width" initial-scale="1.0">
+  <meta name="viewport" content="width=device-width" initial-scale="1.0",minimum-scale="1.0">
   <meta name="description" content="">
-  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" type="text/css" href="./css/style.css">
+  <link rel="stylesheet" type="text/css" href="./css/reset.css">
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-  <!-- <script type="text/javascript" src="XSound/build/xsound.min.js"></script> -->
 </head>
 <body>
-  <audio src="magic-of-love.mp3" id="audio-element" preload="auto"></audio>
+  <audio src="./music/magic-of-love.mp3" id="audio-element" preload="auto"></audio>
 
   <p id="volume"></p>
 
@@ -37,16 +37,15 @@
   <button id="button">Play/Stop</button>
 
   <div>
-    <img id="prfmMagicOfLove" src="perfume_magic-of-love.jpg">
+    <svg id="prfmMagicOfLove" data-name="レイヤー 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 377.26"><defs><style>.cls-1{font-size:130px;font-family:KozMinPro-Regular-83pv-RKSJ-H, Kozuka Mincho Pro;}</style></defs><title>pfrm_magic-of-love</title><text class="cls-1" transform="translate(393.85 114.4)">Perfume<tspan x="-162.63" y="227.5">Magic of Love</tspan></text></svg>
   </div>
 
   <div>
 	  <canvas id="canvas"></canvas>
   </div>
 
-  <script type="text/javascript" src="getusermedia.js"></script>
-	<script type="text/javascript" src="audio.js"></script>
-  <!-- <script src="midi.js"></script> -->
-  <!-- <script src="xsound.js"></script> -->
+  <script type="text/javascript" src="./js/three.min.js"></script>
+  <script type="text/javascript" src="./js/getusermedia.js"></script>
+	<script type="text/javascript" src="./js/audio.js"></script>
 </body>
 </html>

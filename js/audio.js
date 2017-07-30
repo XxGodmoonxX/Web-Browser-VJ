@@ -3,6 +3,10 @@
   //厳格モード
   'use strict';
 
+
+  /*WebAudioAPIを使うための設定*/
+
+
   //AudioContextクラスのコンストラクタを呼び出して、
   //AudioContextクラスのインスタンスを生成。これが処理の起点
   //これをすることにより、Web Audio APIが定義するプロパティやメソッドにアクセス可能。
@@ -12,14 +16,18 @@
   var context = new AudioContext();
 
 
-  //音源ノード生成（audio要素からオーディオデータ取得）
+  /*音源ノード生成（audio要素からオーディオデータ取得）*/
+
+
   //audio要素を取得
   var audioSrc = document.getElementById("audio-element");
   // audio要素を音源とするMediaElementAudioSourceNodeを生成
   var audio = context.createMediaElementSource(audioSrc);
 
 
-  //ゲイン
+  /*ゲイン*/
+
+
   //中間処理（音量調整処理）を表すAudioNodeが持つAudioParamに
   //input要素の値を代入。表示にも値を反映する
   var elementGain = document.getElementById('gain');
@@ -31,7 +39,9 @@
   setGain();
 
 
-  //ローパスフィルター＆ハイパスフィルター
+  /*フィルター（ローパス＆ハイパス*/
+
+
   var elementBiquadFilterType = document.getElementById('biquad-filter-type');
   var elementBiquadFilterFrequency = document.getElementById('biquad-filter-frequency');
   var elementBiquadFilterFrequencyValue = document.getElementById('biquad-filter-frequency-value');
@@ -66,7 +76,6 @@
   };
   setBiquadFilterFrequency();
 
-
   //なにも選ばないときはこれ。
   //音源ノード → GainNode
   audio.connect(gain);
@@ -74,7 +83,9 @@
   gain.connect(context.destination);
 
 
-  //AnalyserNodeオブジェクトを生成
+  /*AnalyserNodeオブジェクトを生成*/
+
+
   var analyser = context.createAnalyser();
   //解析対象の音声データを格納するための型付き配列を準備(Uint8Array:符号なし8bit整数の配列)
   //引数(配列の要素数)にはAnalyserNodeオブジェクトのfrequencyBinCountプロパティを設定する
@@ -90,7 +101,9 @@
   };
 
 
-  //マイク取得
+  /*マイク取得*/
+
+
   //音声のみ取得する場合は引数を{audio: true}に設定する
   //返り値はPromiseオブジェクト
   navigator.mediaDevices.getUserMedia({audio: true})
@@ -105,20 +118,34 @@
     });
 
 
-  //ボリューム表示
-  var draw;
+  /*マイクの音量表示*/
+
+
+  var drawVolume;
   var elementVolume = document.getElementById('volume');
   //可能な限り高いフレームレートで音量を取得し、表示を更新する
-  (draw = function() {
+  (drawVolume = function() {
     elementVolume.innerHTML = Math.floor(getByteFrequencyDataAverage());
-    requestAnimationFrame(draw);
+    requestAnimationFrame(drawVolume);
   })();
 
 
+  /*画像をマイクの音量に応じてSVG不透明に*/
+
+
+  var drawImg;
   var elementImg = document.getElementById('prfmMagicOfLove');
+  //可能な限り高いフレームレートで音量を取得し、表示を更新する
+  (drawImg = function() {
+    //opacityの範囲である0〜1に変換
+    elementImg.style.opacity = getByteFrequencyDataAverage() / 255;
+    requestAnimationFrame(drawImg);
+  })();
 
 
-  // DOMへのイベント登録
+  /*DOMへのイベント登録*/
+
+
   var elementButton = document.getElementById('button');
   var isPlaying;
   //再生＆停止ボタン
@@ -132,5 +159,43 @@
   //
   elementBiquadFilterType.addEventListener('change', setBiquadFilterType);
   elementBiquadFilterFrequency.addEventListener('mouseup', setBiquadFilterFrequency);
+
+
+  /*ビジュアライズ*/
+
+
+  //three.jsの描画
+  //シーン（3D表現をする空間）の作成
+  var scene = new THREE.Scene();
+  //カメラ（シーン内で表示する場所を決める）の作成
+  var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  //レンダラー（用意したシーン、メッシュを表示させる命令）を作る
+  var renderer = new THREE.WebGLRenderer();
+  //レンダラーサイズを設定
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  //レンダラーをbodyに設定
+  document.body.appendChild(renderer.domElement);
+  //ジオメトリー（座標やメッシュ（3Dオブジェクト）の形）
+  //3Dオブジェクトの形と大きさを設定 キューブで1cm四方
+  var geometry = new THREE.CubeGeometry(1, 1, 1);
+  //マテリアル（表面素材やメッシュの色）
+  //3Dオブジェクトの素材と色を設定
+  var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+  //3Dオブジェクトを作成
+  var cube = new THREE.Mesh(geometry, material);
+  //作成された3Dオブジェクトをシーン（scene）に適応
+  scene.add(cube);
+
+  //表示する祭のカメラの角度の設定
+  camera.position.z = 5;
+  //シーンをレンダリング
+  function render() {
+    requestAnimationFrame(render);
+    cube.rotation.x += 0.1;
+    cube.rotation.y += 0.1;
+    renderer.render(scene, camera);
+  }
+  render();
+
 
 })();
