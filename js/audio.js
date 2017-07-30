@@ -83,7 +83,7 @@
   gain.connect(context.destination);
 
 
-  /*AnalyserNodeオブジェクトを生成*/
+  /*音源を解析*/
 
 
   var analyser = context.createAnalyser();
@@ -156,12 +156,25 @@
   });
   //音量調節
   elementGain.addEventListener('mouseup', setGain);
-  //
+  //フィルター選ぶ、数値選ぶやつ表示
   elementBiquadFilterType.addEventListener('change', setBiquadFilterType);
   elementBiquadFilterFrequency.addEventListener('mouseup', setBiquadFilterFrequency);
 
 
-  /*ビジュアライズ*/
+  /*canvasのビジュアライズ*/
+
+
+  var canvas = document.getElementById('canvas');
+  var canvasWidth;
+  var canvasHeight;
+  //canvasをWindowサイズに
+  canvas.width = canvasWidth = window.innerWidth;
+  canvas.height = canvasHeight = window.innerHeight;
+  //描画に必要なコンテキスト（canvasに描画するためのAPIにアクセスできるオブジェクト）を取得
+  var canvasContext = canvas.getContext('2d');
+
+
+  /*three.jsのビジュアライズ*/
 
 
   //three.jsの描画
@@ -180,7 +193,7 @@
   var geometry = new THREE.CubeGeometry(1, 1, 1);
   //マテリアル（表面素材やメッシュの色）
   //3Dオブジェクトの素材と色を設定
-  var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+  var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
   //3Dオブジェクトを作成
   var cube = new THREE.Mesh(geometry, material);
   //作成された3Dオブジェクトをシーン（scene）に適応
