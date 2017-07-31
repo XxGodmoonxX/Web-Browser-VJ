@@ -24,6 +24,9 @@
   // audio要素を音源とするMediaElementAudioSourceNodeを生成
   var audio = context.createMediaElementSource(audioSrc);
 
+  var audioSrc2 = document.getElementById("audio-element2");
+  var audio2 = context.createMediaElementSource(audioSrc2);
+
 
   /*ゲイン*/
 
@@ -79,6 +82,7 @@
   //なにも選ばないときはこれ。
   //音源ノード → GainNode
   audio.connect(gain);
+  audio2.connect(gain);
   //Gainノード -> 音声出力ノード
   gain.connect(context.destination);
 
@@ -148,6 +152,7 @@
 
   var elementButton = document.getElementById('button');
   var isPlaying;
+  var changeMusicButton = document.getElementById('change');
   //再生＆停止ボタン
   elementButton.addEventListener('click', function() {
     //最初は再生されていない、押すと再生
@@ -185,6 +190,7 @@
     // midi.sendNoteOff(40);
     // midi.sendCtlChange(40, 10);
   }
+
 
 
 
