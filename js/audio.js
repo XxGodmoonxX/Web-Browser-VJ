@@ -138,7 +138,7 @@
   //可能な限り高いフレームレートで音量を取得し、表示を更新する
   (drawImg = function() {
     //opacityの範囲である0〜1に変換
-    elementImg.style.opacity = getByteFrequencyDataAverage() / 255;
+    elementImg.style.opacity = getByteFrequencyDataAverage() / 85;
     requestAnimationFrame(drawImg);
   })();
 
@@ -161,17 +161,31 @@
   elementBiquadFilterFrequency.addEventListener('mouseup', setBiquadFilterFrequency);
 
 
-  /*canvasのビジュアライズ*/
+  /*MIDIの設定*/
 
 
-  var canvas = document.getElementById('canvas');
-  var canvasWidth;
-  var canvasHeight;
-  //canvasをWindowサイズに
-  canvas.width = canvasWidth = window.innerWidth;
-  canvas.height = canvasHeight = window.innerHeight;
-  //描画に必要なコンテキスト（canvasに描画するためのAPIにアクセスできるオブジェクト）を取得
-  var canvasContext = canvas.getContext('2d');
+  //初期化
+  var midi = new poormidi();
+  //MIDIを受ける
+  midi.setHandler(onMIDIEvent);
+
+  function onMIDIEvent(e) {
+    var message = e.data[0] & 0xf0;
+    if (message === 0x90) { //Note On
+      //処理
+      console.log('aaa');
+      (function() {
+        audioSrc[!isPlaying ? 'play' : 'pause']();
+        isPlaying = !isPlaying;
+      })();
+    }
+    console.log(message);
+    //NoteNumber 40, Velocity 127
+    // midi.sendNoteOn(40, 127);
+    // midi.sendNoteOff(40);
+    // midi.sendCtlChange(40, 10);
+  }
+
 
 
   /*three.jsのビジュアライズ*/
@@ -180,32 +194,98 @@
   //three.jsの描画
   //シーン（3D表現をする空間）の作成
   var scene = new THREE.Scene();
+
   //カメラ（シーン内で表示する場所を決める）の作成
-  var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 0, 5);
+
   //レンダラー（用意したシーン、メッシュを表示させる命令）を作る
-  var renderer = new THREE.WebGLRenderer();
+  // var renderer = new THREE.WebGLRenderer();
   //レンダラーサイズを設定
+  var renderer = new THREE.WebGLRenderer({ alpha: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor( '#000000', 0.1);
+
+
   //レンダラーをbodyに設定
-  document.body.appendChild(renderer.domElement);
+  // document.body.appendChild(renderer.domElement);
+
+  var canvasThree = document.getElementById('canvasZone');
+  var canvasThreeWidth;
+  var canvasThreeHeight;
+  //canvasをWindowサイズに
+  canvasThree.width = canvasThreeWidth = window.innerWidth;
+  canvasThree.height = canvasThreeHeight = window.innerHeight;
+  canvasThree.appendChild(renderer.domElement);
+
   //ジオメトリー（座標やメッシュ（3Dオブジェクト）の形）
   //3Dオブジェクトの形と大きさを設定 キューブで1cm四方
   var geometry = new THREE.CubeGeometry(1, 1, 1);
+
+  // var geometryUpdate;
+  // var geometry;
+  // (geometryUpdate = function() {
+  //   geometry = new THREE.CubeGeometry(1, 1, 1);
+  //   requestAnimationFrame(geometryUpdate);
+  //
+  //   console.log(getByteFrequencyDataAverage());
+  // })();
+
   //マテリアル（表面素材やメッシュの色）
   //3Dオブジェクトの素材と色を設定
-  var material = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+  var material = new THREE.MeshBasicMaterial( {color: '#ffffff', wireframe: true} );
   //3Dオブジェクトを作成
-  var cube = new THREE.Mesh(geometry, material);
+  var cube_1 = new THREE.Mesh(geometry, material);
+  cube_1.position.x = 0;
+  var cube_2 = new THREE.Mesh(geometry, material);
+  cube_2.position.x = -2;
+  var cube_3 = new THREE.Mesh(geometry, material);
+  cube_3.position.x = 2;
+  var cube_4 = new THREE.Mesh(geometry, material);
+  cube_4.position.y = 1.5;
+  var cube_5 = new THREE.Mesh(geometry, material);
+  cube_5.position.y = -1.5;
+  // var cubeUpdate;
+  // var cube;
+  // (cubeUpdate = function() {
+  //   cube = new THREE.Mesh(geometry, material);
+  //   requestAnimationFrame(cubeUpdate);
+  // })();
+
   //作成された3Dオブジェクトをシーン（scene）に適応
-  scene.add(cube);
+  scene.add(cube_1);
+  scene.add(cube_2);
+  scene.add(cube_3);
+  scene.add(cube_4);
+  scene.add(cube_5);
+  // var sceneUpdate;
+  // (sceneUpdate = function() {
+  //   scene.add(cube);
+  //   requestAnimationFrame(sceneUpdate);
+  // })();
+
 
   //表示する祭のカメラの角度の設定
-  camera.position.z = 5;
+  // camera.position.z = 5;
   //シーンをレンダリング
+  // var frame = 0;
   function render() {
+    var rotationX = 0.1;
+    var rotationY = 0.1;
     requestAnimationFrame(render);
-    cube.rotation.x += 0.1;
-    cube.rotation.y += 0.1;
+    cube_1.rotation.x += rotationX;
+    cube_1.rotation.y += rotationY;
+    cube_2.rotation.x += rotationX;
+    cube_2.rotation.y += rotationY;
+    cube_3.rotation.x += rotationX;
+    cube_3.rotation.y += rotationY;
+    cube_4.rotation.x += rotationX;
+    cube_4.rotation.y += rotationY;
+    cube_5.rotation.x += rotationX;
+    cube_5.rotation.y += rotationY;
+    // cube.rotation.z += 0.1;
+    // frame++;
+    // if (frame % 2 == 0) {return;}
     renderer.render(scene, camera);
   }
   render();
