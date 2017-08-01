@@ -142,7 +142,7 @@
   //可能な限り高いフレームレートで音量を取得し、表示を更新する
   (drawImg = function() {
     //opacityの範囲である0〜1に変換
-    elementImg.style.opacity = getByteFrequencyDataAverage() / 85;
+    elementImg.style.opacity = getByteFrequencyDataAverage() / 64;
     requestAnimationFrame(drawImg);
   })();
 
